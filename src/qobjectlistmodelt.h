@@ -33,8 +33,12 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef QObjectListModelT_H
-#define QObjectListModelT_H
+
+#pragma once
+
+#include "qobjectlistmodel.h"
+
+#include <QList>
 
 /*
 subclass QObjectListModelT<T> to work with a typed QObjectListModel,
@@ -51,10 +55,10 @@ public:
     QObjectListModelT(QObjectListModelT<T> *objectListModel, QObject *parent = 0) : QObjectListModel(objectListModel, parent) { }
     QList<T> objectList() const;
     void setObjectList(const QList<T> &objects);
-    inline T at(int i) const { return (T)(m_objects.at(i)); }
-    inline T operator[](int i) const { return (T)m_objects[i]; }
-    inline T first() const { return (T)m_objects.at(0); }
-    inline T last() const { return (T)m_objects.last(); }
+    inline T at(int i) const { return static_cast<T>(m_objects.at(i)); }
+    inline T operator[](int i) const { return static_cast<T>(m_objects[i]); }
+    inline T first() const { return static_cast<T>(m_objects.at(0)); }
+    inline T last() const { return static_cast<T>(m_objects.last()); }
 
     T get(const int i) const;
     T getByName(const QString &str) const;
@@ -63,13 +67,13 @@ public:
 template <class T>
 T QObjectListModelT<T>::getByName( const QString &str ) const
 {
-    return (T)QObjectListModel::getByName(str);
+    return static_cast<T>QObjectListModel::getByName(str);
 }
 
 template <class T>
 T QObjectListModelT<T>::get( const int i ) const
 {
-    return (T)QObjectListModel::get(i);
+    return static_cast<T>QObjectListModel::get(i);
 }
 
 template <class T>
@@ -95,5 +99,3 @@ QList<T> QObjectListModelT<T>::objectList() const
 public: \
     CLASSNAME(QObject *parent=NULL):QObjectListModelT<TYPENAME>(parent) {} \
 };
-
-#endif

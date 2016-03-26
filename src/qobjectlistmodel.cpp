@@ -42,13 +42,8 @@
 #include "qobjectlistmodel.h"
 #include "QObjectListModelIndex.h"
 
-QHash<int, QByteArray> INIT_ROLES()
-{
-    QHash<int, QByteArray> roles;
-    roles[QObjectListModel::ObjectRole] = "object";
-    return roles;
-}
-const QHash<int, QByteArray> ROLES = INIT_ROLES();
+#include <QDebug>
+#include <QQmlEngine>
 
 /*!
 \class QObjectListModel
@@ -87,11 +82,9 @@ Constructs an object list model with the given \a parent.
 */
 QObjectListModel::QObjectListModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_indexByName(nullptr)
     , m_tracking(false)
+    , m_indexByName(nullptr)
 {
-    setRoleNames(ROLES);
-
 #ifdef _DEBUG
     m_accessCountIndexOfObject = 0;
     m_accessCountIndexOfName = 0;
@@ -104,12 +97,10 @@ with the given \a parent.
 */
 QObjectListModel::QObjectListModel(const QList<QObject*> &objects, QObject *parent)
     : QAbstractListModel(parent)
-    , m_indexByName(nullptr)
-    , m_tracking(false)
     , m_objects(objects)
+    , m_tracking(false)
+    , m_indexByName(nullptr)
 {
-    setRoleNames(ROLES);
-
 #ifdef _DEBUG
     m_accessCountIndexOfObject = 0;
     m_accessCountIndexOfName = 0;
@@ -118,18 +109,22 @@ QObjectListModel::QObjectListModel(const QList<QObject*> &objects, QObject *pare
 
 QObjectListModel::QObjectListModel( QObjectListModel *objectListModel, QObject *parent /*= 0*/ )
     : QAbstractListModel(parent)
-    , m_indexByName(nullptr)
-    , m_tracking(false)
     , m_objects(objectListModel->objectList())
+    , m_tracking(false)
+    , m_indexByName(nullptr)
 {
-    setRoleNames(ROLES);
-
 #ifdef _DEBUG
     m_accessCountIndexOfObject = 0;
     m_accessCountIndexOfName = 0;
 #endif
 }
 
+QHash<int, QByteArray> QObjectListModel::roleNames() const
+{
+    QHash<int, QByteArray> modelRoleNames = QAbstractListModel::roleNames();
+    modelRoleNames.insert(ObjectRole, "object");
+    return modelRoleNames;
+}
 
 /*!
 Returns data for the specified \a role, from the item with the
@@ -200,6 +195,7 @@ void QObjectListModel::trackObject( const QObject *obj, const bool on )
     else
         disconnect(obj, SIGNAL(destroyed(QObject *)), this, SIGNAL(destroyed(QObject *)));
 }
+
 /*!
 Inserts \a object at the end of the model and notifies any views.
 
@@ -377,7 +373,7 @@ QObject * QObjectListModel::get(const int i) const
     if (i<0 || i>=m_objects.count())
         return nullptr;
     QObject *obj = at(i);
-    QDeclarativeEngine::setObjectOwnership(obj, QDeclarativeEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
     return obj;
 }
 
@@ -393,7 +389,7 @@ Q_INVOKABLE QObject * QObjectListModel::getByName( const QString & str ) const
 
 Q_INVOKABLE void QObjectListModel::listAppend( QObject * obj )
 {
-    QDeclarativeEngine::setObjectOwnership(obj, QDeclarativeEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
     append(obj);
 }
 
@@ -401,7 +397,7 @@ Q_INVOKABLE void QObjectListModel::listInsert( int at, QObject * obj )
 {
     if(at<0 || at>count())
         return;
-    QDeclarativeEngine::setObjectOwnership(obj, QDeclarativeEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
     insert(at, obj);
 }
 
@@ -496,7 +492,9 @@ void QObjectListModel::setIndexByName( bool enable )
         m_indexByName = nullptr;
 }
 
+#ifdef _DEBUG
 const int ACCESSCOUNT_PRINTINTERVAL = 10;
+#endif
 
 Q_INVOKABLE  int QObjectListModel::indexOf( QObject *object, int from /*= 0*/ ) const
 {

@@ -33,32 +33,30 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef QObjectListModelIndex_H
-#define QObjectListModelIndex_H
+
+#pragma once
 
 #include "QObjectListModelAdapter.h"
 #include <QHash>
 
 class QObjectListModelIndexByName : public QObjectListModelAdapter {
-	Q_OBJECT;
+    Q_OBJECT
 public:
-	QObjectListModelIndexByName(QObjectListModel * listModel, bool enabled = true, QObject * parent = NULL);
+    QObjectListModelIndexByName(QObjectListModel * listModel, bool enabled = true, QObject * parent = NULL);
 
-	bool containsObject(QObject * obj) const;
-	bool containsName(const QString & name) const;
-	int indexOfObject(QObject * obj) const;
-	int indexOfName(const QString & name) const;
+    bool containsObject(QObject * obj) const;
+    bool containsName(const QString & name) const;
+    int indexOfObject(QObject * obj) const;
+    int indexOfName(const QString & name) const;
 
 protected slots:
-	void onNameChanged();
-	void removeAllFromIndex();
-	void onWatchRemovalsChanged();
+    void onNameChanged();
+    void removeAllFromIndex();
+    void onWatchRemovalsChanged();
 protected:
-	virtual void insertFor( int index, QObject * obj, int listCount );
-	virtual void removeFor( int index, QObject * obj, int listCount );
-	QHash<QString,int> m_hashmapName;
-	QHash<QObject*,QString> m_hashmapObject;
-	bool m_trackNameChanges;
+    virtual void insertFor( int index, QObject * obj, int listCount );
+    virtual void removeFor( int index, QObject * obj, int listCount );
+    QHash<QString,int> m_hashmapName;
+    QHash<QObject*,QString> m_hashmapObject;
+    bool m_trackNameChanges;
 };
-
-#endif 

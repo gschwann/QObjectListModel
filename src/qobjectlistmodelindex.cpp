@@ -33,103 +33,104 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
+
 #include "QObjectListModelIndex.h"
 #include "QObjectListModel.h"
 
+#include <QDebug>
 
 QObjectListModelIndexByName::QObjectListModelIndexByName( QObjectListModel * listModel, bool enabled /*= true*/, QObject * parent /*= NULL*/ )
-	: QObjectListModelAdapter(listModel, enabled, parent)
-	, m_trackNameChanges(true)
+    : QObjectListModelAdapter(listModel, enabled, parent)
+    , m_trackNameChanges(true)
 {
-	connect(this,SIGNAL(watchRemovalsChanged()),this,SLOT(onWatchRemovalsChanged()));
-	onWatchRemovalsChanged();
+    connect(this,SIGNAL(watchRemovalsChanged()),this,SLOT(onWatchRemovalsChanged()));
+    onWatchRemovalsChanged();
 }
 
 int QObjectListModelIndexByName::indexOfName( const QString & name ) const
 {
-	int idx = m_hashmapName.value(name, -1);
-	return idx;
+    int idx = m_hashmapName.value(name, -1);
+    return idx;
 }
 
 int QObjectListModelIndexByName::indexOfObject( QObject * obj ) const
 {
-	if(!m_hashmapObject.contains(obj)) 
-		return -1;
-	int idx = indexOfName(m_hashmapObject.value(obj));
-	Q_ASSERT(!containsObject(obj) || listModel()->at(idx) == obj);
-	return idx;
+    if(!m_hashmapObject.contains(obj))
+        return -1;
+    int idx = indexOfName(m_hashmapObject.value(obj));
+    Q_ASSERT(!containsObject(obj) || listModel()->at(idx) == obj);
+    return idx;
 }
 
 void QObjectListModelIndexByName::insertFor( int index, QObject * obj, int listCount )
 {
-	const QString & name = obj->objectName();
-	if(m_hashmapName.contains(name))
-	{
-		qWarning()<<"name index has duplicate entry: "<<name;
-		return;
-	}
-	m_hashmapName.insert(name, index);
-	m_hashmapObject.insert(obj, name); // always save original object name, it can change
-	if(m_trackNameChanges)
-	{
-		// try to connect to nameChanged signal if existing (like for qbobjects)
-		connect(obj, SIGNAL(nameChanged()), this, SLOT(onNameChanged()));
-	}
+    const QString & name = obj->objectName();
+    if(m_hashmapName.contains(name))
+    {
+        qWarning()<<"name index has duplicate entry: "<<name;
+        return;
+    }
+    m_hashmapName.insert(name, index);
+    m_hashmapObject.insert(obj, name); // always save original object name, it can change
+    if(m_trackNameChanges)
+    {
+        // try to connect to nameChanged signal if existing (like for qbobjects)
+        connect(obj, SIGNAL(nameChanged()), this, SLOT(onNameChanged()));
+    }
 
-	// update indices > index
-	for(int i=index+1; i < listCount; ++i)
-		m_hashmapName.insert(listModel()->at(i)->objectName(), i);
+    // update indices > index
+    for(int i=index+1; i < listCount; ++i)
+        m_hashmapName.insert(listModel()->at(i)->objectName(), i);
 }
 
 void QObjectListModelIndexByName::removeFor( int index, QObject * obj, int listCount )
 {
-	if(!m_hashmapObject.contains(obj)) 
-		return;
-	// remove by original name (name could have changed after indexing)
-	m_hashmapName.remove(m_hashmapObject.value(obj));
-	m_hashmapObject.remove(obj);
+    if(!m_hashmapObject.contains(obj))
+        return;
+    // remove by original name (name could have changed after indexing)
+    m_hashmapName.remove(m_hashmapObject.value(obj));
+    m_hashmapObject.remove(obj);
 
-	// update indices > index
-	int n = listModel()->count();
-	for(int i=index+1; i < listCount; ++i)
-		m_hashmapName.insert(listModel()->at(i)->objectName(), i-1);
+    // update indices > index
+    for(int i=index+1; i < listCount; ++i)
+        m_hashmapName.insert(listModel()->at(i)->objectName(), i-1);
 }
 
 void QObjectListModelIndexByName::removeAllFromIndex()
 {
-	m_hashmapName.clear();
-	m_hashmapObject.clear();
+    m_hashmapName.clear();
+    m_hashmapObject.clear();
 }
 
 void QObjectListModelIndexByName::onWatchRemovalsChanged()
 {
-	if(watchRemovals())
-	{
-		disconnect(listModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(removeAll())); // override remove all -> efficiency
-		connect(listModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(removeAllFromIndex()));
-	}
-	else
-	{
-		disconnect(listModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(removeAllFromIndex()));
-	}
+    if(watchRemovals())
+    {
+        disconnect(listModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(removeAll())); // override remove all -> efficiency
+        connect(listModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(removeAllFromIndex()));
+    }
+    else
+    {
+        disconnect(listModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(removeAllFromIndex()));
+    }
 }
 
 void QObjectListModelIndexByName::onNameChanged()
 {
-	QObject * obj = sender();
-	int index = indexOfObject(obj);
-	removeFor(index, obj, index+1);
-	m_trackNameChanges = false;
-	insertFor(index, obj, index+1);
-	m_trackNameChanges = true; // must have been true before, this function has been called because of this
+    QObject * obj = sender();
+    int index = indexOfObject(obj);
+    removeFor(index, obj, index+1);
+    m_trackNameChanges = false;
+    insertFor(index, obj, index+1);
+    m_trackNameChanges = true; // must have been true before, this function has been called because of this
 }
 
 bool QObjectListModelIndexByName::containsObject( QObject * obj ) const
 {
-	return m_hashmapObject.contains(obj);
+    return m_hashmapObject.contains(obj);
 }
 
 bool QObjectListModelIndexByName::containsName( const QString & name ) const
 {
-	return m_hashmapName.contains(name);
+    return m_hashmapName.contains(name);
 }

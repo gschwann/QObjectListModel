@@ -38,131 +38,139 @@
 
 void QObjectListModelAdapter::setListModel( QObjectListModel* list )
 {
-	if(m_list == list) return;
-	if(m_enabled && m_list)
-		disconnectAndClear();
-	m_list = list;
-	if(m_enabled && m_list)
-		connectAndRefill();
-	emit listModelChanged(); 
+    if(m_list == list) return;
+    if(m_enabled && m_list)
+        disconnectAndClear();
+    m_list = list;
+    if(m_enabled && m_list)
+        connectAndRefill();
+    emit listModelChanged();
 }
 
 void QObjectListModelAdapter::connectAndRefill()
 {
-	loadAll();
-	if(m_watchInsertions)
-		connectInsertionSignals();
-	if(m_watchRemovals)
-		connectRemovalSignals();
+    loadAll();
+    if(m_watchInsertions)
+        connectInsertionSignals();
+    if(m_watchRemovals)
+        connectRemovalSignals();
 }
 
 void QObjectListModelAdapter::disconnectAndClear()
 {
-	m_list->disconnect(this);
-	removeAll();
+    m_list->disconnect(this);
+    removeAll();
 }
 
 void QObjectListModelAdapter::loadAll()
 {
-	int n = m_list->count();
-	for(int i=0;i!=n;++i)
-		insertFor(i, m_list->at(i),i+1);
+    int n = m_list->count();
+    for(int i=0;i!=n;++i)
+        insertFor(i, m_list->at(i),i+1);
 }
 
 void QObjectListModelAdapter::removeAll()
 {
-	int n = m_list->count();
-	for(int i=n;i!=0;--i)
-		removeFor(i-1, m_list->at(i-1),i);
+    int n = m_list->count();
+    for(int i=n;i!=0;--i)
+        removeFor(i-1, m_list->at(i-1),i);
 }
 
 void QObjectListModelAdapter::listInsert( const QModelIndex & parent, int start, int end )
 {
-	for(int i=start;i<=end;++i)
-		insertFor(i, m_list->at(i),m_list->count());
+    Q_UNUSED(parent)
+    for(int i=start;i<=end;++i)
+        insertFor(i, m_list->at(i),m_list->count());
 }
 
 void QObjectListModelAdapter::listRemove( const QModelIndex & parent, int start, int end )
 {
-	for(int i=start;i<=end;++i)
-		removeFor(i, m_list->at(i),m_list->count());
+    Q_UNUSED(parent)
+    for(int i=start;i<=end;++i)
+        removeFor(i, m_list->at(i),m_list->count());
 }
 
 QObjectListModelAdapter::QObjectListModelAdapter( QObjectListModel * listModel, bool enabled, QObject * parent /*= NULL*/ )
-	: QObject(parent)
-	, m_list(listModel)
-	, m_enabled(enabled)
-	, m_watchInsertions(true)
-	, m_watchRemovals(true)
+    : QObject(parent)
+    , m_list(listModel)
+    , m_enabled(enabled)
+    , m_watchInsertions(true)
+    , m_watchRemovals(true)
 {
-	if(m_list && m_enabled)
-		connectAndRefill();
+    if(m_list && m_enabled)
+        connectAndRefill();
 }
 
 QObjectListModelAdapter::~QObjectListModelAdapter()
 {
-	if(m_list && m_enabled)
-		removeAll();
+    if(m_list && m_enabled)
+        removeAll();
 }
 
 void QObjectListModelAdapter::setEnabled( bool const value )
 {
-	if(m_enabled == value) 
-		return;
-	m_enabled = value; 
-	if(m_list)
-		if(value)
-			connectAndRefill();
-		else
-			disconnectAndClear();
-	emit enabledChanged(); 
+    if(m_enabled == value)
+        return;
+    m_enabled = value;
+    if(m_list) {
+        if(value) {
+            connectAndRefill();
+        } else {
+            disconnectAndClear();
+        }
+    }
+    emit enabledChanged();
 }
 
 void QObjectListModelAdapter::setWatchInsertions( bool val )
 {
-	if(m_watchInsertions == val) return;
-	m_watchInsertions = val;
-	if(m_list)
-		if(m_enabled)
-			connectInsertionSignals();
-		else
-			disconnectInsertionSignals();
-	emit watchInsertionsChanged();
+    if(m_watchInsertions == val) return;
+    m_watchInsertions = val;
+    if(m_list) {
+        if(m_enabled) {
+            connectInsertionSignals();
+        } else {
+            disconnectInsertionSignals();
+        }
+    }
+    emit watchInsertionsChanged();
 }
 
 void QObjectListModelAdapter::setWatchRemovals( bool val )
 {
-	if(m_watchRemovals == val) return;
-	m_watchRemovals = val;
-	if(m_list)
-		if(m_enabled)
-			connectRemovalSignals();
-		else
-			disconnectRemovalSignals();
-	emit watchRemovalsChanged();
+    if(m_watchRemovals == val) return;
+    m_watchRemovals = val;
+    if(m_list) {
+        if(m_enabled) {
+            connectRemovalSignals();
+        } else {
+            disconnectRemovalSignals();
+        }
+    }
+    emit watchRemovalsChanged();
 }
 
 void QObjectListModelAdapter::connectInsertionSignals() const
 {
-	connect(m_list, SIGNAL(modelReset()), this, SLOT(loadAll()));
-	connect(m_list, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(listInsert(const QModelIndex &, int, int)));
+    connect(m_list, SIGNAL(modelReset()), this, SLOT(loadAll()));
+    connect(m_list, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(listInsert(const QModelIndex &, int, int)));
 }
 
 void QObjectListModelAdapter::disconnectInsertionSignals() const
 {
-	disconnect(m_list, SIGNAL(modelReset()), this, SLOT(loadAll()));
-	disconnect(m_list, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(listInsert(const QModelIndex &, int, int)));
+    disconnect(m_list, SIGNAL(modelReset()), this, SLOT(loadAll()));
+    disconnect(m_list, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(listInsert(const QModelIndex &, int, int)));
 }
 
 void QObjectListModelAdapter::connectRemovalSignals() const
 {
-	connect(m_list, SIGNAL(modelAboutToBeReset()), this, SLOT(removeAll()));
-	connect(m_list, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), this, SLOT(listRemove(const QModelIndex &, int, int)));
+    connect(m_list, SIGNAL(modelAboutToBeReset()), this, SLOT(removeAll()));
+    connect(m_list, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), this, SLOT(listRemove(const QModelIndex &, int, int)));
 }
 
 void QObjectListModelAdapter::disconnectRemovalSignals() const
 {
-	disconnect(m_list, SIGNAL(modelAboutToBeReset()), this, SLOT(removeAll()));
-	disconnect(m_list, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), this, SLOT(listRemove(const QModelIndex &, int, int)));
+    disconnect(m_list, SIGNAL(modelAboutToBeReset()), this, SLOT(removeAll()));
+    disconnect(m_list, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), this, SLOT(listRemove(const QModelIndex &, int, int)));
 }
 

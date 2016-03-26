@@ -39,11 +39,12 @@
 **
 ****************************************************************************/
 
-#ifndef QOBJECTLISTMODEL_H
-#define QOBJECTLISTMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
-#include <QtDeclarative/QDeclarativeEngine>
+#include <QByteArray>
+#include <QHash>
+
 class QObjectListModelIndexByName;
 
 /*
@@ -56,7 +57,7 @@ static type checking on the C++ side.
 
 class QObjectListModel : public QAbstractListModel
 {
-    Q_OBJECT;
+    Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 public:
     explicit QObjectListModel(QObject *parent = 0);
@@ -64,7 +65,7 @@ public:
     QObjectListModel(QObjectListModel *objectListModel, QObject *parent = 0);
     ~QObjectListModel();
 
-    inline QObject * parent() const { return QObject::parent(); }
+//    inline QObject * parent() const { return QObject::parent(); }
 
     // connects destroy signals
     void setTracking(bool v ) { m_tracking = v; }
@@ -72,9 +73,10 @@ public:
 
     //model API
     enum Roles { ObjectRole = Qt::UserRole+1 };
+    QHash<int, QByteArray> roleNames() const override;
 
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
     Q_INVOKABLE QVariant dataByRole(const int i, int role) const;
 
     // directly access underlying QList data storage
@@ -144,5 +146,3 @@ protected:
     int m_accessCountIndexOfName;
 #endif
 };
-
-#endif // QOBJECTMODEL_H
