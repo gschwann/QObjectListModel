@@ -67,13 +67,13 @@ public:
 template <class T>
 T QObjectListModelT<T>::getByName( const QString &str ) const
 {
-    return static_cast<T>QObjectListModel::getByName(str);
+    return static_cast<T>(QObjectListModel::getByName(str));
 }
 
 template <class T>
 T QObjectListModelT<T>::get( const int i ) const
 {
-    return static_cast<T>QObjectListModel::get(i);
+    return static_cast<T>(QObjectListModel::get(i));
 }
 
 template <class T>

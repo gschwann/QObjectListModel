@@ -1,2 +1,3 @@
 TEMPLATE = subdirs
-SUBDIRS = qobjectlistmodel
+SUBDIRS = qobjectlistmodel\
+    qobjectlistmodelt
