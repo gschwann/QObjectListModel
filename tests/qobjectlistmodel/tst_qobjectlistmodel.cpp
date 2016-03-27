@@ -52,7 +52,7 @@ public:
 
 private slots:
     void init();
-    void cleanUp();
+    void cleanup();
 
     void sizeOfEmptyModel();
     void sizeOfModelOneItem();
@@ -71,7 +71,7 @@ void TestQObjectListModel::init()
     m_model = new QObjectListModel(this);
 }
 
-void TestQObjectListModel::cleanUp()
+void TestQObjectListModel::cleanup()
 {
     m_model->clear(true);
     delete m_model;
