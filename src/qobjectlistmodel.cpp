@@ -40,7 +40,7 @@
 ****************************************************************************/
 
 #include "qobjectlistmodel.h"
-#include "QObjectListModelIndex.h"
+#include "qobjectlistmodelindex.h"
 
 #include <QDebug>
 #include <QQmlEngine>

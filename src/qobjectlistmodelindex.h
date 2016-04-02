@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "QObjectListModelAdapter.h"
+#include "qobjectlistmodeladapter.h"
 #include <QHash>
 
 class QObjectListModelIndexByName : public QObjectListModelAdapter {
