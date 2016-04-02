@@ -70,6 +70,22 @@ public:
 
     T get(const int i) const;
     T getByName(const QString& str) const;
+    using value_type = T;
+
+    typedef typename QList<T>::iterator iterator;
+    typedef typename QList<T>::const_iterator const_iterator;
+
+    iterator begin() { return objectListRef().begin(); }
+    const_iterator begin() const { return objectListRef().begin(); }
+    const_iterator cbegin() const { return objectListRef().cbegin(); }
+
+    iterator end() { return objectListRef().end(); }
+    const_iterator end() const { return objectListRef().end(); }
+    const_iterator cend() const { return objectListRef().end(); }
+
+private:
+    QList<T>& objectListRef();
+    const QList<T>& objectListRef() const;
 };
 
 template <class T> T QObjectListModelT<T>::getByName(const QString& str) const
@@ -97,6 +113,16 @@ template <class T> void QObjectListModelT<T>::setObjectList(const QList<T>& obje
 template <class T> QList<T> QObjectListModelT<T>::objectList() const
 {
     return *reinterpret_cast<QList<T>*>(&QObjectListModel::objectList());
+}
+
+template <class T> const QList<T>& QObjectListModelT<T>::objectListRef() const
+{
+    return *reinterpret_cast<const QList<T>*>(&m_objects);
+}
+
+template <class T> QList<T>& QObjectListModelT<T>::objectListRef()
+{
+    return *reinterpret_cast<QList<T>*>(&m_objects);
 }
 
 #define DECLARE_QBLIST_MODEL(CLASSNAME, TYPENAME)                                                  \
