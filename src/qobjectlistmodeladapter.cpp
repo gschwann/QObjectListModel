@@ -33,7 +33,7 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#include "QObjectListModelAdapter.h"
+#include "qobjectlistmodeladapter.h"
 #include "qobjectlistmodel.h"
 
 void QObjectListModelAdapter::setListModel( QObjectListModel* list )

@@ -34,8 +34,8 @@
 **
 ****************************************************************************/
 
-#include "QObjectListModelIndex.h"
-#include "QObjectListModel.h"
+#include "qobjectlistmodelindex.h"
+#include "qobjectlistmodel.h"
 
 #include <QDebug>
 
