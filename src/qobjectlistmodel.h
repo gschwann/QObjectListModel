@@ -2,6 +2,8 @@
 **
 ** Copyright (C) 2016 Guenter Schwann
 **
+** Copyright (C) 2016 Guenter Schwann
+**
 ** Copyright (C) 2012 IPO.Plan GmbH
 **
 **
