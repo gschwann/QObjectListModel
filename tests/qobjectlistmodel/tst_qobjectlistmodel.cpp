@@ -44,7 +44,7 @@
 #include <QSignalSpy>
 #include <QtTest>
 
-class TestQObjectListModel: public QObject
+class TestQObjectListModel : public QObject
 {
     Q_OBJECT
 public:
@@ -66,10 +66,7 @@ TestQObjectListModel::TestQObjectListModel()
 {
 }
 
-void TestQObjectListModel::init()
-{
-    m_model = new QObjectListModel(this);
-}
+void TestQObjectListModel::init() { m_model = new QObjectListModel(this); }
 
 void TestQObjectListModel::cleanup()
 {
@@ -78,10 +75,7 @@ void TestQObjectListModel::cleanup()
     m_model = nullptr;
 }
 
-void TestQObjectListModel::sizeOfEmptyModel()
-{
-    QCOMPARE(m_model->size(), 0);
-}
+void TestQObjectListModel::sizeOfEmptyModel() { QCOMPARE(m_model->size(), 0); }
 
 void TestQObjectListModel::sizeOfModelOneItem()
 {

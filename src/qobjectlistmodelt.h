@@ -1,5 +1,7 @@
 /****************************************************************************
 **
+** Copyright (C) 2016 Guenter Schwann
+**
 ** Copyright (C) 2012 IPO.Plan GmbH
 **
 ** $QT_BEGIN_LICENSE:BSD$
@@ -47,55 +49,63 @@ class RackObjectListModel : public QObjectListModelT<Rack*> {
 };
 */
 
-template <class T>
-class QObjectListModelT : public QObjectListModel {
+template <class T> class QObjectListModelT : public QObjectListModel
+{
 public:
-    QObjectListModelT<T>(QObject *parent = 0) : QObjectListModel(parent) { }
-    QObjectListModelT(const QList<T> &objects, QObject *parent = 0);
-    QObjectListModelT(QObjectListModelT<T> *objectListModel, QObject *parent = 0) : QObjectListModel(objectListModel, parent) { }
+    QObjectListModelT<T>(QObject* parent = 0)
+        : QObjectListModel(parent)
+    {
+    }
+    QObjectListModelT(const QList<T>& objects, QObject* parent = 0);
+    QObjectListModelT(QObjectListModelT<T>* objectListModel, QObject* parent = 0)
+        : QObjectListModel(objectListModel, parent)
+    {
+    }
     QList<T> objectList() const;
-    void setObjectList(const QList<T> &objects);
+    void setObjectList(const QList<T>& objects);
     inline T at(int i) const { return static_cast<T>(m_objects.at(i)); }
     inline T operator[](int i) const { return static_cast<T>(m_objects[i]); }
     inline T first() const { return static_cast<T>(m_objects.at(0)); }
     inline T last() const { return static_cast<T>(m_objects.last()); }
 
     T get(const int i) const;
-    T getByName(const QString &str) const;
+    T getByName(const QString& str) const;
 };
 
-template <class T>
-T QObjectListModelT<T>::getByName( const QString &str ) const
+template <class T> T QObjectListModelT<T>::getByName(const QString& str) const
 {
     return static_cast<T>(QObjectListModel::getByName(str));
 }
 
-template <class T>
-T QObjectListModelT<T>::get( const int i ) const
+template <class T> T QObjectListModelT<T>::get(const int i) const
 {
     return static_cast<T>(QObjectListModel::get(i));
 }
 
 template <class T>
-QObjectListModelT<T>::QObjectListModelT( const QList<T> &objects, QObject *parent /*= 0*/ ) : QObjectListModel(parent)
+QObjectListModelT<T>::QObjectListModelT(const QList<T>& objects, QObject* parent /*= 0*/)
+    : QObjectListModel(parent)
 {
     setObjectList(objects);
 }
 
-template <class T>
-void QObjectListModelT<T>::setObjectList( const QList<T> &objects )
+template <class T> void QObjectListModelT<T>::setObjectList(const QList<T>& objects)
 {
     QObjectListModel::setObjectList(*reinterpret_cast<const QList<QObject*>*>(&objects));
 }
 
-template <class T>
-QList<T> QObjectListModelT<T>::objectList() const
+template <class T> QList<T> QObjectListModelT<T>::objectList() const
 {
     return *reinterpret_cast<QList<T>*>(&QObjectListModel::objectList());
 }
 
-#define DECLARE_QBLIST_MODEL(CLASSNAME, TYPENAME) class CLASSNAME : public QObjectListModelT<TYPENAME>  { \
-    Q_OBJECT \
-public: \
-    CLASSNAME(QObject *parent=NULL):QObjectListModelT<TYPENAME>(parent) {} \
-};
+#define DECLARE_QBLIST_MODEL(CLASSNAME, TYPENAME)                                                  \
+    class CLASSNAME : public QObjectListModelT<TYPENAME>                                           \
+    {                                                                                              \
+        Q_OBJECT                                                                                   \
+    public:                                                                                        \
+        CLASSNAME(QObject* parent = NULL)                                                          \
+            : QObjectListModelT<TYPENAME>(parent)                                                  \
+        {                                                                                          \
+        }                                                                                          \
+    };

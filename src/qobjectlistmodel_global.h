@@ -2,6 +2,8 @@
 **
 ** Copyright (C) 2016 Guenter Schwann
 **
+** Copyright (C) 2016 Guenter Schwann
+**
 **
 ** Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
 ** All rights reserved.
@@ -44,7 +46,7 @@
 #include <QtCore/qglobal.h>
 
 #if defined(QOBJECTLISTMODEL_LIBRARY)
-#  define QOBJECTLISTMODELSHARED_EXPORT Q_DECL_EXPORT
+#define QOBJECTLISTMODELSHARED_EXPORT Q_DECL_EXPORT
 #else
-#  define QOBJECTLISTMODELSHARED_EXPORT Q_DECL_IMPORT
+#define QOBJECTLISTMODELSHARED_EXPORT Q_DECL_IMPORT
 #endif
