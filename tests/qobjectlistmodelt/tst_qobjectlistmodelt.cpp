@@ -43,36 +43,47 @@
 
 #include <QtTest>
 
-class Person : public QObject
+class IntNumber : public QObject
 {
-};
+public:
+    explicit IntNumber(int number)
+        : m_number(number)
+    {
+    }
+    explicit IntNumber(QObject* parent)
+        : QObject(parent)
+        , m_number{}
+    {
+    }
 
-class PersonObjectListModel : public QObjectListModelT<Person*>
-{
+    int m_number;
 };
 
 class TestQObjectListModelT : public QObject
 {
     Q_OBJECT
 private slots:
-    void init();
     void cleanup();
-    void dummyTest();
+    void rangeBasedForLoopTest();
 
 private:
-    PersonObjectListModel* m_model;
+    QObjectListModelT<IntNumber*> m_model;
 };
 
-void TestQObjectListModelT::init() { m_model = new PersonObjectListModel; }
+void TestQObjectListModelT::cleanup() { m_model.clear(true); }
 
-void TestQObjectListModelT::cleanup()
+void TestQObjectListModelT::rangeBasedForLoopTest()
 {
-    m_model->clear(true);
-    delete m_model;
-    m_model = nullptr;
+    m_model.append(new IntNumber{1});
+    m_model.append(new IntNumber{2});
+    m_model.append(new IntNumber{3});
+    int sum = 0;
+    for (const auto& item : m_model) {
+        sum += item->m_number;
+    }
+    m_model.clear(true);
+    QCOMPARE(sum, 6);
 }
-
-void TestQObjectListModelT::dummyTest() { QCOMPARE(0, 0); }
 
 QTEST_MAIN(TestQObjectListModelT)
 #include "tst_qobjectlistmodelt.moc"
