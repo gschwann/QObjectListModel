@@ -62,64 +62,68 @@ class QObjectListModel : public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 public:
-    explicit QObjectListModel(QObject *parent = 0);
-    QObjectListModel(const QList<QObject*> &objects, QObject *parent = 0);
-    QObjectListModel(QObjectListModel *objectListModel, QObject *parent = 0);
+    explicit QObjectListModel(QObject* parent = 0);
+    QObjectListModel(const QList<QObject*>& objects, QObject* parent = 0);
+    QObjectListModel(QObjectListModel* objectListModel, QObject* parent = 0);
     ~QObjectListModel();
 
-//    inline QObject * parent() const { return QObject::parent(); }
+    //    inline QObject * parent() const { return QObject::parent(); }
 
     // connects destroy signals
-    void setTracking(bool v ) { m_tracking = v; }
-    void trackObject(const QObject *obj, const bool on );
+    void setTracking(bool v) { m_tracking = v; }
+    void trackObject(const QObject* obj, const bool on);
 
-    //model API
-    enum Roles { ObjectRole = Qt::UserRole+1 };
+    // model API
+    enum Roles { ObjectRole = Qt::UserRole + 1 };
     QHash<int, QByteArray> roleNames() const override;
 
-    int rowCount(const QModelIndex &parent) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    int rowCount(const QModelIndex& parent) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
     Q_INVOKABLE QVariant dataByRole(const int i, int role) const;
 
     // directly access underlying QList data storage
     QList<QObject*> objectList() const;
-    void setObjectList(const QList<QObject*> &objects);
+    void setObjectList(const QList<QObject*>& objects);
 
-    //list API
-    void append(QObject *object);
-    void append(const QList<QObject*> &objects);
-    void insert(int i, QObject *object);
-    void insert(int i, const QList<QObject*> &objects);
-    inline QObject *first() const { return m_objects.at(0); }
-    inline QObject *last() const { return m_objects.last(); }
-    inline QObject *at(int i) const { return m_objects.at(i); }
-    inline QObject *operator[](int i) const { return m_objects[i]; }
+    // list API
+    void append(QObject* object);
+    void append(const QList<QObject*>& objects);
+    void insert(int i, QObject* object);
+    void insert(int i, const QList<QObject*>& objects);
+    inline QObject* first() const { return m_objects.at(0); }
+    inline QObject* last() const { return m_objects.last(); }
+    inline QObject* at(int i) const { return m_objects.at(i); }
+    inline QObject* operator[](int i) const { return m_objects[i]; }
 
-    void replace(int i, QObject *object);
+    void replace(int i, QObject* object);
     void move(int from, int to);
 
     void removeAt(int i, int count = 1);
-    QObject *takeAt(int i);
-    void clear(bool deleteObjects=false);
+    QObject* takeAt(int i);
+    void clear(bool deleteObjects = false);
 
-    bool contains(QObject *object) const;
-    bool containsName(const QString & str) const;
-    Q_INVOKABLE int indexOf (QObject *object, int from = 0) const;
-    inline int lastIndexOf (QObject *object, int from = -1) const { return m_objects.lastIndexOf(object, from); }
-    Q_INVOKABLE int indexOfName (const QString & str) const;
+    bool contains(QObject* object) const;
+    bool containsName(const QString& str) const;
+    Q_INVOKABLE int indexOf(QObject* object, int from = 0) const;
+    inline int lastIndexOf(QObject* object, int from = -1) const
+    {
+        return m_objects.lastIndexOf(object, from);
+    }
+    Q_INVOKABLE int indexOfName(const QString& str) const;
 
     inline int count() const { return m_objects.count(); }
     inline int size() const { return m_objects.size(); }
     inline bool isEmpty() const { return m_objects.isEmpty(); }
 
-    //additional QML API
-    Q_INVOKABLE QObject *get(const int i) const;
-    Q_INVOKABLE QObject *getByName( const QString & str) const;
-    Q_INVOKABLE void listAppend(QObject * obj);
-    Q_INVOKABLE void listInsert(int at, QObject * obj);
-    Q_INVOKABLE void listRemove(int at, int count=1);
+    // additional QML API
+    Q_INVOKABLE QObject* get(const int i) const;
+    Q_INVOKABLE QObject* getByName(const QString& str) const;
+    Q_INVOKABLE void listAppend(QObject* obj);
+    Q_INVOKABLE void listInsert(int at, QObject* obj);
+    Q_INVOKABLE void listRemove(int at, int count = 1);
     Q_INVOKABLE void listSetFromObjectListModel(QObjectListModel* model);
-    Q_INVOKABLE void listSetFromItemModel(QAbstractItemModel* model, int role=ObjectRole, int column=0);
+    Q_INVOKABLE void listSetFromItemModel(
+        QAbstractItemModel* model, int role = ObjectRole, int column = 0);
 
     void sortByName();
 
@@ -128,19 +132,19 @@ public:
 
     // set up index for objects and their names
     // speeds up contains/indexOf/indexOfName etc...
-    inline bool hasIndexByName() const { return m_indexByName!=nullptr; }
+    inline bool hasIndexByName() const { return m_indexByName != nullptr; }
     void setIndexByName(bool enable);
 
 signals:
     void countChanged();
 
 protected slots:
-    void onObjectDestroyed( QObject *obj );
+    void onObjectDestroyed(QObject* obj);
 
 protected:
     QList<QObject*> m_objects;
     bool m_tracking;
-    QObjectListModelIndexByName * m_indexByName;
+    QObjectListModelIndexByName* m_indexByName;
 
 #ifdef _DEBUG
     // to record access patterns to decide if indexing is useful

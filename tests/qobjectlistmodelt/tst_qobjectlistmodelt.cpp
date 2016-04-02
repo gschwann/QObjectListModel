@@ -43,7 +43,7 @@
 
 #include <QtTest>
 
-class Person: public QObject
+class Person : public QObject
 {
 };
 
@@ -51,21 +51,19 @@ class PersonObjectListModel : public QObjectListModelT<Person*>
 {
 };
 
-class TestQObjectListModelT: public QObject
+class TestQObjectListModelT : public QObject
 {
     Q_OBJECT
 private slots:
     void init();
     void cleanup();
     void dummyTest();
+
 private:
     PersonObjectListModel* m_model;
 };
 
-void TestQObjectListModelT::init()
-{
-    m_model = new PersonObjectListModel;
-}
+void TestQObjectListModelT::init() { m_model = new PersonObjectListModel; }
 
 void TestQObjectListModelT::cleanup()
 {
@@ -74,10 +72,7 @@ void TestQObjectListModelT::cleanup()
     m_model = nullptr;
 }
 
-void TestQObjectListModelT::dummyTest()
-{
-    QCOMPARE(0, 0);
-}
+void TestQObjectListModelT::dummyTest() { QCOMPARE(0, 0); }
 
 QTEST_MAIN(TestQObjectListModelT)
 #include "tst_qobjectlistmodelt.moc"

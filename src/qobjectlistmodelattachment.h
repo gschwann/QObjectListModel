@@ -54,20 +54,22 @@ return attachedListModel<Shelf*>(this, "shelvesListAdapter", m_shelves);
 QList<Shelf*> m_shelves;
 */
 
-template<class T>
-static QObjectListModelT<T> * attachedListModel( QObject * attachedTo, const char * propertyName, const QList<T> &init_objects )
+template <class T>
+static QObjectListModelT<T>* attachedListModel(
+    QObject* attachedTo, const char* propertyName, const QList<T>& init_objects)
 {
-    QVariant list_variant = attachedTo->property(propertyName); // this property caches the list model
-    if(list_variant.isValid())  // return cached
-        if(QObject * list_object = qvariant_cast<QObject *>(list_variant))
-            if(QObjectListModelT<T> * list_adapter = dynamic_cast<QObjectListModelT<T> *>(list_object))
-            {
-                if(list_adapter->objectList() != init_objects)
-                    list_adapter->setObjectList(init_objects); //update if necessary
+    QVariant list_variant
+        = attachedTo->property(propertyName); // this property caches the list model
+    if (list_variant.isValid()) // return cached
+        if (QObject* list_object = qvariant_cast<QObject*>(list_variant))
+            if (QObjectListModelT<T>* list_adapter
+                = dynamic_cast<QObjectListModelT<T>*>(list_object)) {
+                if (list_adapter->objectList() != init_objects)
+                    list_adapter->setObjectList(init_objects); // update if necessary
                 return list_adapter;
             }
     // create new adapter
-    QObjectListModelT<T> * list_adapter = new QObjectListModelT<T>(init_objects, attachedTo);
+    QObjectListModelT<T>* list_adapter = new QObjectListModelT<T>(init_objects, attachedTo);
     attachedTo->setProperty(propertyName, QVariant(QMetaType::QObjectStar, &list_adapter));
     return list_adapter;
 }

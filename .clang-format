@@ -1,0 +1,11 @@
+---
+Language:        Cpp
+BasedOnStyle:  WebKit
+ColumnLimit:     100
+Cpp11BracedListStyle: true
+Standard:        Cpp11
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+BreakBeforeBraces: Linux
+...

@@ -80,7 +80,7 @@ delegate: Text { text: object.someProperty }
 /*!
 Constructs an object list model with the given \a parent.
 */
-QObjectListModel::QObjectListModel(QObject *parent)
+QObjectListModel::QObjectListModel(QObject* parent)
     : QAbstractListModel(parent)
     , m_tracking(false)
     , m_indexByName(nullptr)
@@ -95,7 +95,7 @@ QObjectListModel::QObjectListModel(QObject *parent)
 Constructs an object list model containing the specified \a objects
 with the given \a parent.
 */
-QObjectListModel::QObjectListModel(const QList<QObject*> &objects, QObject *parent)
+QObjectListModel::QObjectListModel(const QList<QObject*>& objects, QObject* parent)
     : QAbstractListModel(parent)
     , m_objects(objects)
     , m_tracking(false)
@@ -107,7 +107,7 @@ QObjectListModel::QObjectListModel(const QList<QObject*> &objects, QObject *pare
 #endif
 }
 
-QObjectListModel::QObjectListModel( QObjectListModel *objectListModel, QObject *parent /*= 0*/ )
+QObjectListModel::QObjectListModel(QObjectListModel* objectListModel, QObject* parent /*= 0*/)
     : QAbstractListModel(parent)
     , m_objects(objectListModel->objectList())
     , m_tracking(false)
@@ -133,13 +133,12 @@ given \a index. The only valid role is \c ObjectRole.
 If the view requests an invalid index or role, an invalid variant
 is returned.
 */
-QVariant QObjectListModel::data(const QModelIndex &index, int role) const
+QVariant QObjectListModel::data(const QModelIndex& index, int role) const
 {
     if (index.row() < 0 || index.row() >= m_objects.size())
         return QVariant();
 
-    switch (role)
-    {
+    switch (role) {
     case ObjectRole:
         return QVariant::fromValue(m_objects.at(index.row()));
     case Qt::DisplayRole:
@@ -152,7 +151,7 @@ QVariant QObjectListModel::data(const QModelIndex &index, int role) const
 Returns the number of rows in the model. This value corresponds to the
 number of items in the model's internal object list.
 */
-int QObjectListModel::rowCount(const QModelIndex &parent) const
+int QObjectListModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return count();
@@ -161,39 +160,38 @@ int QObjectListModel::rowCount(const QModelIndex &parent) const
 /*!
 Returns the object list used by the model to store data.
 */
-QList<QObject*> QObjectListModel::objectList() const
-{
-    return m_objects;
-}
+QList<QObject*> QObjectListModel::objectList() const { return m_objects; }
 
 /*!
 Sets the model's internal objects list to \a objects. The model will
 notify any attached views that its underlying data has changed.
 */
-void QObjectListModel::setObjectList(const QList<QObject*> &objects)
+void QObjectListModel::setObjectList(const QList<QObject*>& objects)
 {
     int oldCount = m_objects.count();
     beginResetModel();
-    if (oldCount&&m_tracking) {
-        foreach(const QObject *obj, objectList()) trackObject(obj, false);
+    if (oldCount && m_tracking) {
+        foreach (const QObject* obj, objectList())
+            trackObject(obj, false);
     }
     m_objects = objects;
     if (m_tracking) {
-        foreach(const QObject *obj, objectList()) trackObject(obj, true);
+        foreach (const QObject* obj, objectList())
+            trackObject(obj, true);
     }
 
     endResetModel();
-    emit dataChanged(index(0), index(m_objects.count()-1));
+    emit dataChanged(index(0), index(m_objects.count() - 1));
     if (m_objects.count() != oldCount)
         emit countChanged();
 }
 
-void QObjectListModel::trackObject( const QObject *obj, const bool on )
+void QObjectListModel::trackObject(const QObject* obj, const bool on)
 {
     if (on)
-        connect(obj, SIGNAL(destroyed(QObject *)), this, SLOT(onObjectDestroyed(QObject*)));
+        connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onObjectDestroyed(QObject*)));
     else
-        disconnect(obj, SIGNAL(destroyed(QObject *)), this, SIGNAL(destroyed(QObject *)));
+        disconnect(obj, SIGNAL(destroyed(QObject*)), this, SIGNAL(destroyed(QObject*)));
 }
 
 /*!
@@ -203,11 +201,12 @@ This is the same as model.insert(size(), \a object).
 
 \sa insert()
 */
-void QObjectListModel::append(QObject *object)
+void QObjectListModel::append(QObject* object)
 {
     beginInsertRows(QModelIndex(), m_objects.count(), m_objects.count());
     m_objects.append(object);
-    if (m_tracking) trackObject(object, true);
+    if (m_tracking)
+        trackObject(object, true);
     endInsertRows();
     emit countChanged();
 }
@@ -216,13 +215,15 @@ void QObjectListModel::append(QObject *object)
 \overload
 Appends the items of the \a objects list to this model and notifies any views.
 */
-void QObjectListModel::append(const QList<QObject*> &objects)
+void QObjectListModel::append(const QList<QObject*>& objects)
 {
-    if(objects.count() == 0) return;
-    beginInsertRows(QModelIndex(), m_objects.count(), m_objects.count()+objects.count()-1);
+    if (objects.count() == 0)
+        return;
+    beginInsertRows(QModelIndex(), m_objects.count(), m_objects.count() + objects.count() - 1);
     m_objects.append(objects);
     if (m_tracking)
-        foreach(QObject *obj, m_objects) trackObject(obj, true);
+        foreach (QObject* obj, m_objects)
+            trackObject(obj, true);
     endInsertRows();
     emit countChanged();
 }
@@ -234,7 +235,7 @@ is size(), the object is appended to the list.
 
 \sa append(), replace(), removeAt()
 */
-void QObjectListModel::insert(int i, QObject *object)
+void QObjectListModel::insert(int i, QObject* object)
 {
     beginInsertRows(QModelIndex(), i, i);
     m_objects.insert(i, object);
@@ -250,15 +251,15 @@ Inserts the items of the \a objects list at index position \a i in the model
 and notifies any views. If \a i is 0, the items are prepended to the model. If \a i
 is size(), the items are appended to the list.
 */
-void QObjectListModel::insert(int i, const QList<QObject*> &objects)
+void QObjectListModel::insert(int i, const QList<QObject*>& objects)
 {
-    if(objects.count() == 0) return;
-    beginInsertRows(QModelIndex(), i, i+objects.count()-1);
-    for (int j = objects.count() - 1; j > -1; --j)
-    {
+    if (objects.count() == 0)
+        return;
+    beginInsertRows(QModelIndex(), i, i + objects.count() - 1);
+    for (int j = objects.count() - 1; j > -1; --j) {
         m_objects.insert(i, objects.at(j));
         if (m_tracking)
-            trackObject( objects.at(j), true);
+            trackObject(objects.at(j), true);
     }
     endInsertRows();
     emit countChanged();
@@ -271,7 +272,7 @@ notifies any views. \a i must be a valid index position in the list
 
 \sa removeAt()
 */
-void QObjectListModel::replace(int i, QObject *object)
+void QObjectListModel::replace(int i, QObject* object)
 {
     if (m_tracking)
         trackObject(m_objects.at(i), false);
@@ -293,8 +294,8 @@ least 0 and less than size().
 
 void QObjectListModel::move(int from, int to)
 {
-    if (!beginMoveRows(QModelIndex(), from, from, QModelIndex(), to > from ? to+1 : to))
-        return; //should only be triggered for our simple case if from == to.
+    if (!beginMoveRows(QModelIndex(), from, from, QModelIndex(), to > from ? to + 1 : to))
+        return; // should only be triggered for our simple case if from == to.
     m_objects.move(from, to);
     endMoveRows();
 }
@@ -308,14 +309,13 @@ must \c{i + count}.
 */
 void QObjectListModel::removeAt(int i, int count)
 {
-    if(count == 0) return;
-    beginRemoveRows(QModelIndex(), i, i + count-1);
-    for (int j = 0; j < count; ++j)
-    {
+    if (count == 0)
+        return;
+    beginRemoveRows(QModelIndex(), i, i + count - 1);
+    for (int j = 0; j < count; ++j) {
         if (m_tracking)
             trackObject(m_objects.at(i), false);
         m_objects.removeAt(i);
-
     }
     endRemoveRows();
     emit countChanged();
@@ -327,10 +327,10 @@ Removes the item at index position \a i (notifying any views) and returns it.
 
 \sa removeAt()
 */
-QObject *QObjectListModel::takeAt(int i)
+QObject* QObjectListModel::takeAt(int i)
 {
     beginRemoveRows(QModelIndex(), i, i);
-    QObject *obj = m_objects.takeAt(i);
+    QObject* obj = m_objects.takeAt(i);
     if (m_tracking)
         trackObject(obj, false);
     endRemoveRows();
@@ -347,15 +347,15 @@ void QObjectListModel::clear(bool deleteObjects)
     if (m_objects.isEmpty())
         return;
     beginResetModel();
-    //beginRemoveRows(QModelIndex(), 0, m_objects.count() - 1);
+    // beginRemoveRows(QModelIndex(), 0, m_objects.count() - 1);
     if (m_tracking)
-        foreach(const QObject *obj, m_objects) trackObject(obj, false);
+        foreach (const QObject* obj, m_objects)
+            trackObject(obj, false);
     m_objects = QList<QObject*>(); //.clear();
     endResetModel();
-    //endRemoveRows();
+    // endRemoveRows();
     emit countChanged();
-    if (deleteObjects)
-    {
+    if (deleteObjects) {
         qDeleteAll(tmp);
         /*foreach(QObject *obj, tmp)
         {
@@ -368,11 +368,11 @@ void QObjectListModel::clear(bool deleteObjects)
 \internal
 For usage from QML.
 */
-QObject * QObjectListModel::get(const int i) const
+QObject* QObjectListModel::get(const int i) const
 {
-    if (i<0 || i>=m_objects.count())
+    if (i < 0 || i >= m_objects.count())
         return nullptr;
-    QObject *obj = at(i);
+    QObject* obj = at(i);
     QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
     return obj;
 }
@@ -381,78 +381,75 @@ QObject * QObjectListModel::get(const int i) const
 \internal
 For usage from QML.
 */
-Q_INVOKABLE QObject * QObjectListModel::getByName( const QString & str ) const
+Q_INVOKABLE QObject* QObjectListModel::getByName(const QString& str) const
 {
     return get(indexOfName(str));
 }
 
-
-Q_INVOKABLE void QObjectListModel::listAppend( QObject * obj )
+Q_INVOKABLE void QObjectListModel::listAppend(QObject* obj)
 {
     QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
     append(obj);
 }
 
-Q_INVOKABLE void QObjectListModel::listInsert( int at, QObject * obj )
+Q_INVOKABLE void QObjectListModel::listInsert(int at, QObject* obj)
 {
-    if(at<0 || at>count())
+    if (at < 0 || at > count())
         return;
     QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
     insert(at, obj);
 }
 
-Q_INVOKABLE void QObjectListModel::listSetFromObjectListModel( QObjectListModel* model )
+Q_INVOKABLE void QObjectListModel::listSetFromObjectListModel(QObjectListModel* model)
 {
     setObjectList(model->objectList());
 }
 
-Q_INVOKABLE void QObjectListModel::listSetFromItemModel( QAbstractItemModel* model, int role, int column )
+Q_INVOKABLE void QObjectListModel::listSetFromItemModel(
+    QAbstractItemModel* model, int role, int column)
 {
-    if(model->columnCount()<=column)
+    if (model->columnCount() <= column)
         return;
     int rows = model->rowCount();
-    QList<QObject*> list; list.reserve(rows);
-    for(int row=0;row!=rows;++row)
-        list.append(model->data(model->index(row,column),role).value<QObject*>());
+    QList<QObject*> list;
+    list.reserve(rows);
+    for (int row = 0; row != rows; ++row)
+        list.append(model->data(model->index(row, column), role).value<QObject*>());
     setObjectList(list);
 }
 
-Q_INVOKABLE void QObjectListModel::listRemove( int at, int countD )
+Q_INVOKABLE void QObjectListModel::listRemove(int at, int countD)
 {
-    if(at<0 || at>=count())
+    if (at < 0 || at >= count())
         return;
-    removeAt(at,countD);
+    removeAt(at, countD);
 }
 
-
-void QObjectListModel::onObjectDestroyed( QObject *obj )
+void QObjectListModel::onObjectDestroyed(QObject* obj)
 {
-    //qDebug() << "## objlistmodel on destroyed " << obj;
-    int idx=indexOf(obj);
-    if (idx !=-1)
-    {
-        //qDebug() << "take at " << idx;
+    // qDebug() << "## objlistmodel on destroyed " << obj;
+    int idx = indexOf(obj);
+    if (idx != -1) {
+        // qDebug() << "take at " << idx;
         bool t = m_tracking;
         m_tracking = false;
         takeAt(idx);
         m_tracking = t;
     }
-
 }
 
 void QObjectListModel::dump() const
 {
     qDebug() << m_objects.count() << "objects:";
-    for (int i=0;i!=m_objects.count();i++)
-    {
+    for (int i = 0; i != m_objects.count(); i++) {
         qDebug() << i << m_objects.at(i)->objectName();
-        //qDebug() << m_objects.at(i);
+        // qDebug() << m_objects.at(i);
     }
 }
 
 void QObjectListModel::touch()
 {
-    //qDebug() << "objmodel touch" << this;
+    // qDebug() << "objmodel touch" << this;
     beginResetModel();
     endResetModel();
     emit countChanged();
@@ -470,24 +467,22 @@ void QObjectListModel::sortByName()
     endResetModel();
 }
 
-QVariant QObjectListModel::dataByRole( const int i, int role ) const
-{
-    return data(index(i), role);
-}
+QVariant QObjectListModel::dataByRole(const int i, int role) const { return data(index(i), role); }
 
-bool QObjectListModel::contains( QObject *object ) const
+bool QObjectListModel::contains(QObject* object) const
 {
-    if(hasIndexByName()) return m_indexByName->containsObject(object);
+    if (hasIndexByName())
+        return m_indexByName->containsObject(object);
     return m_objects.contains(object);
 }
 
-void QObjectListModel::setIndexByName( bool enable )
+void QObjectListModel::setIndexByName(bool enable)
 {
-    if(hasIndexByName()==enable)
+    if (hasIndexByName() == enable)
         return;
 
-    if(enable)
-        m_indexByName = new QObjectListModelIndexByName(this,true,this);
+    if (enable)
+        m_indexByName = new QObjectListModelIndexByName(this, true, this);
     else
         m_indexByName = nullptr;
 }
@@ -496,34 +491,37 @@ void QObjectListModel::setIndexByName( bool enable )
 const int ACCESSCOUNT_PRINTINTERVAL = 10;
 #endif
 
-Q_INVOKABLE  int QObjectListModel::indexOf( QObject *object, int from /*= 0*/ ) const
+Q_INVOKABLE int QObjectListModel::indexOf(QObject* object, int from /*= 0*/) const
 {
-    if(from == 0 && hasIndexByName()) return m_indexByName->indexOfObject(object);
+    if (from == 0 && hasIndexByName())
+        return m_indexByName->indexOfObject(object);
 #ifdef _DEBUG
     const_cast<QObjectListModel*>(this)->m_accessCountIndexOfObject++;
-    if(m_accessCountIndexOfObject%ACCESSCOUNT_PRINTINTERVAL==0)
-        qDebug()<<"QObjectListModel::m_accessCountIndexOfObject="<<m_accessCountIndexOfObject;
+    if (m_accessCountIndexOfObject % ACCESSCOUNT_PRINTINTERVAL == 0)
+        qDebug() << "QObjectListModel::m_accessCountIndexOfObject=" << m_accessCountIndexOfObject;
 #endif
     return m_objects.indexOf(object, from);
 }
 
-bool QObjectListModel::containsName( const QString & str ) const
+bool QObjectListModel::containsName(const QString& str) const
 {
-    if(hasIndexByName()) return m_indexByName->containsName(str);
+    if (hasIndexByName())
+        return m_indexByName->containsName(str);
     return indexOfName(str) != -1;
 }
 
-Q_INVOKABLE int QObjectListModel::indexOfName( const QString & str ) const
+Q_INVOKABLE int QObjectListModel::indexOfName(const QString& str) const
 {
-    if(hasIndexByName()) return m_indexByName->indexOfName(str);
+    if (hasIndexByName())
+        return m_indexByName->indexOfName(str);
 #ifdef _DEBUG
     const_cast<QObjectListModel*>(this)->m_accessCountIndexOfName++;
-    if(m_accessCountIndexOfName%ACCESSCOUNT_PRINTINTERVAL==0)
-        qDebug()<<"QObjectListModel::m_accessCountIndexOfName="<<m_accessCountIndexOfName;
+    if (m_accessCountIndexOfName % ACCESSCOUNT_PRINTINTERVAL == 0)
+        qDebug() << "QObjectListModel::m_accessCountIndexOfName=" << m_accessCountIndexOfName;
 #endif
     int n = count();
-    for (int i=0;i!=n;++i)
-        if (at(i)->objectName()==str)
+    for (int i = 0; i != n; ++i)
+        if (at(i)->objectName() == str)
             return i;
     return -1;
 }
@@ -537,15 +535,6 @@ QObjectListModel::~QObjectListModel()
     //	;
     //#endif
 }
-
-
-
-
-
-
-
-
-
 
 /*!
 \fn int QObjectListModel::size() const
@@ -610,5 +599,3 @@ otherwise returns false.
 
 \sa indexOf(), count()
 */
-
-

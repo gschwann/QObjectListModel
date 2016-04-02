@@ -41,17 +41,19 @@
 
 class QObjectListModel;
 
-class QObjectListModelAdapter : public QObject {
+class QObjectListModelAdapter : public QObject
+{
     Q_OBJECT
-    Q_PROPERTY(QObjectListModel * listModel READ listModel NOTIFY listModelChanged)
+    Q_PROPERTY(QObjectListModel* listModel READ listModel NOTIFY listModelChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 public:
-    QObjectListModelAdapter(QObjectListModel * listModel, bool enabled = true, QObject * parent = NULL);
+    QObjectListModelAdapter(
+        QObjectListModel* listModel, bool enabled = true, QObject* parent = NULL);
     ~QObjectListModelAdapter();
     QObjectListModel* listModel() const { return m_list; }
-    void setListModel(QObjectListModel* listModel );
+    void setListModel(QObjectListModel* listModel);
     bool enabled() const { return m_enabled; }
-    void setEnabled( bool const value );
+    void setEnabled(bool const value);
     bool watchInsertions() const { return m_watchInsertions; }
     void setWatchInsertions(bool val);
     bool watchRemovals() const { return m_watchRemovals; }
@@ -62,44 +64,49 @@ signals:
     void watchInsertionsChanged();
     void watchRemovalsChanged();
 protected slots:
-    void listInsert(const QModelIndex & parent, int start, int end);
-    void listRemove(const QModelIndex & parent, int start, int end);
+    void listInsert(const QModelIndex& parent, int start, int end);
+    void listRemove(const QModelIndex& parent, int start, int end);
     void loadAll();
     void removeAll();
+
 protected:
     void connectAndRefill();
     void disconnectAndClear();
 
-    virtual void insertFor(int index, QObject * obj, int listCount) = 0;
-    virtual void removeFor(int index, QObject * obj, int listCount) = 0;
+    virtual void insertFor(int index, QObject* obj, int listCount) = 0;
+    virtual void removeFor(int index, QObject* obj, int listCount) = 0;
 
 private:
     void connectInsertionSignals() const;
     void connectRemovalSignals() const;
     void disconnectInsertionSignals() const;
     void disconnectRemovalSignals() const;
-    QObjectListModel *m_list;
+    QObjectListModel* m_list;
     bool m_enabled;
     bool m_watchInsertions;
     bool m_watchRemovals;
 };
 
-class QObjectListModelAdapterSignal : public QObjectListModelAdapter {
+class QObjectListModelAdapterSignal : public QObjectListModelAdapter
+{
     Q_OBJECT
 public:
-    QObjectListModelAdapterSignal(QObjectListModel * listModel, bool enabled = true, QObject * parent = NULL)
-        : QObjectListModelAdapter(listModel, enabled, parent) {}
+    QObjectListModelAdapterSignal(
+        QObjectListModel* listModel, bool enabled = true, QObject* parent = NULL)
+        : QObjectListModelAdapter(listModel, enabled, parent)
+    {
+    }
 signals:
-    void insert(int index, QObject * obj);
-    void remove(int index, QObject * obj);
+    void insert(int index, QObject* obj);
+    void remove(int index, QObject* obj);
 
 protected:
-    virtual void insertFor(int index, QObject * obj, int listCount) override
+    virtual void insertFor(int index, QObject* obj, int listCount) override
     {
         Q_UNUSED(listCount)
         emit insert(index, obj);
     }
-    virtual void removeFor(int index, QObject * obj, int listCount) override
+    virtual void removeFor(int index, QObject* obj, int listCount) override
     {
         Q_UNUSED(listCount)
         emit remove(index, obj);
