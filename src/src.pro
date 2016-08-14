@@ -2,6 +2,7 @@ QT  += qml
 
 TARGET = QObjectListModel
 TEMPLATE = lib
+CONFIG += c++11
 
 DEFINES += QOBJECTLISTMODEL_LIBRARY
 
