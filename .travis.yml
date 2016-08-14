@@ -9,7 +9,7 @@ before_install:
 - sudo apt-get install -qq qtbase5-dev-tools qtdeclarative5-dev
 
 script:
-  - qmake . -recursice
+  - qmake . -recursive
   - make
 
 after_success:
